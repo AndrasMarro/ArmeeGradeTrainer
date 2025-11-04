@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Shuffle, Award, Users, BookOpenCheck, Trophy, RotateCcw, ArrowRight } from 'lucide-react';
+import {
+  Shuffle,
+  Award,
+  Users,
+  BookOpenCheck,
+  Trophy,
+  GitHub,
+  RotateCcw,
+  ArrowRight,
+  Github,
+  GitBranch,
+  GitBranchIcon,
+  GitCommit,
+  GithubIcon,
+} from 'lucide-react';
 import ranks from './data/swiss-army-ranks.js';
 
 const SwissArmyRanksApp = () => {
@@ -108,7 +122,7 @@ const SwissArmyRanksApp = () => {
         if (currentPlayerIndex < players.length - 1) {
           setCurrentPlayerIndex(currentPlayerIndex + 1);
         } else {
-          setMode('passplay-results');
+          setMode('results');
           return;
         }
       }
@@ -137,9 +151,9 @@ const SwissArmyRanksApp = () => {
           <span>{language === 'de' ? 'DE' : 'FR'}</span>
         </button>
 
-        <div className='max-w-md w-full bg-white rounded-2xl shadow-2xl p-8'>
+        <div className='max-w-md w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-2xl shadow-2xl p-8'>
           <div className='text-center mb-8'>
-            <div className='text-6xl mb-4'>
+            <div className='text-6xl mb-2'>
               <img
                 src='https://prod-armeech-hcms-sdweb.imgix.net/2024/06/06/1d03d822-6ea2-475d-b3db-925d02aa9720.jpeg?auto=format'
                 alt='img'
@@ -153,10 +167,19 @@ const SwissArmyRanksApp = () => {
           <div className='space-y-4'>
             <button
               onClick={startLearningMode}
-              className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
+              className='w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
             >
               <Award size={24} />
               <span>Lernmodus</span>
+            </button>
+
+            <button
+              onClick={allGradesOverview}
+              disabled={true}
+              className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
+            >
+              <BookOpenCheck size={24} />
+              <span>Testmodus</span>
             </button>
 
             <button
@@ -172,13 +195,16 @@ const SwissArmyRanksApp = () => {
               className='w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
             >
               <BookOpenCheck size={24} />
-              <span>All Grades</span>
+              <span>Alle Grade</span>
             </button>
           </div>
 
           <div className='mt-8 text-center text-md text-gray-500'>
             <p>Lerne alle {ranks.length} Armeegrade</p>
-            <p className='text-xs text-gray-400 mt-4'>Entwickelt von A. Marro - v.1.0</p>
+            <span className='text-xs text-gray-400 mt-4'>Entwickelt von A. Marro - v1.1</span>
+            <a href='https://github.com/AndrasMarro/ArmeeGradeTrainer'>
+              <GithubIcon className='mx-auto my-2 text-gray-500' size={24} />
+            </a>
           </div>
         </div>
       </div>
@@ -222,7 +248,7 @@ const SwissArmyRanksApp = () => {
               {players.map((player, index) => (
                 <div
                   key={index}
-                  className='flex justify-between items-center bg-gray-50 px-4 py-2 rounded-lg'
+                  className='flex justify-between items-center bg-green-200 px-4 py-2 rounded-lg'
                 >
                   <span className='font-medium text-gray-700'>{player}</span>
                   <button
@@ -265,7 +291,7 @@ const SwissArmyRanksApp = () => {
     );
   }
 
-  if (mode === 'passplay-results') {
+  if (mode === 'results') {
     const sortedScores = [...playerScores].sort((a, b) => b.score - a.score);
     const winner = sortedScores[0];
 
@@ -282,7 +308,7 @@ const SwissArmyRanksApp = () => {
             {sortedScores.map((player, index) => (
               <div
                 key={index}
-                className='bg-gray-50 rounded-lg p-4 flex justify-between items-center'
+                className='bg-gray-200 rounded-lg p-4 flex justify-between items-center'
               >
                 <div className='flex items-center gap-3'>
                   <span className='text-2xl font-bold text-gray-400'>#{index + 1}</span>
@@ -420,7 +446,7 @@ const SwissArmyRanksApp = () => {
 
           {/* Progress for Pass & Play */}
           {gameMode === 'passplay' && (
-            <div className='bg-white rounded-b-2xl p-4 shadow-lg'>
+            <div className='bg-white rounded-b-2xl px-4 pb-4 shadow-lg'>
               <div className='flex justify-between text-sm text-gray-600'>
                 {playerScores.map((player, index) => (
                   <div

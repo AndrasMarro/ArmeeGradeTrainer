@@ -1,0 +1,17 @@
+- todolist/ideas:
+
+game / "lernmodus":
+- some grades appear twice
+- infinite game, but maybe add a finish button for a overview of the run
+    -> mode=passplay-results make viable for "lernmodus" and test mode
+    -> mode=results
+
+pass&play:
+- fix the pass&play aspect, change player after each question
+- fix winning player if everyone wins
+
+test mode:
+- mode where skills are tested, goes through every grade once and gives a review like pass&play
+
+misc:
+- global language support, not just grades and categories

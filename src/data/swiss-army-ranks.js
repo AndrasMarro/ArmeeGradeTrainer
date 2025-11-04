@@ -151,7 +151,7 @@ const ranks = [
     name: { de: 'Korpskommandant', fr: 'Commandant de corps' },
     category: { de: 'Höhere Stabsoffiziere', fr: "Officiers supérieurs d'état-major" },
     image:
-      'https://prod-armeech-hcms-sdweb.imgix.net/2024/06/25/4c2095a5-41c7-4a7d-985d-6c28736ad52b.jpeg?auto=format',
+      'https://prod-armeech-hcms-sdweb.imgix.net/2024/06/25/9ec6faca-9143-4c73-8c84-4cca32d6fc52.jpeg?auto=format',
   },
 
   // General
