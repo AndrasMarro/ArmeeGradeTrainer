@@ -19,6 +19,12 @@ const ranks = [
     image:
       'https://prod-armeech-hcms-sdweb.imgix.net/2024/06/25/b6d1f53c-1209-4021-b24c-fb1ebe8dd14c.jpeg?rect=0%2C7%2C471%2C265&auto=format',
   },
+  {
+    name: { de: 'Obergefreiter', fr: 'Appointé-chef' },
+    category: { de: 'Mannschaft', fr: 'Troupe' },
+    image:
+      'https://www.militaershop.ch/media/image/bf/1e/8a/gradabzeichen-schweizer-militaer-obergefreiter.jpg',
+  },
 
   // Unteroffiziere
   {

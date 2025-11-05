@@ -1,4 +1,4 @@
-- todolist/ideas:
+todolist/ideas:
 
 game / "lernmodus":
 - some grades appear twice
@@ -15,3 +15,4 @@ test mode:
 
 misc:
 - global language support, not just grades and categories
+✅ Add "Obergefreiter"

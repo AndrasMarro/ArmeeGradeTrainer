@@ -85,7 +85,7 @@ const SwissArmyRanksApp = () => {
   const generateQuestion = () => {
     const correctRank = ranks[Math.floor(Math.random() * ranks.length)];
     const wrongRanks = ranks
-      .filter((r) => r.name !== correctRank.name.de)
+      .filter((r) => r.name !== correctRank.name)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3);
 
