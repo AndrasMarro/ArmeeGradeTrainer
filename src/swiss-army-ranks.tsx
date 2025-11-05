@@ -13,6 +13,7 @@ import {
   GitBranchIcon,
   GitCommit,
   GithubIcon,
+  Files,
 } from 'lucide-react';
 import ranks from './data/swiss-army-ranks.js';
 
@@ -169,7 +170,7 @@ const SwissArmyRanksApp = () => {
               onClick={startLearningMode}
               className='w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
             >
-              <Award size={24} />
+              <BookOpenCheck size={24} />
               <span>Lernmodus</span>
             </button>
 
@@ -178,7 +179,7 @@ const SwissArmyRanksApp = () => {
               disabled={true}
               className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
             >
-              <BookOpenCheck size={24} />
+              <Award size={24} />
               <span>Testmodus</span>
             </button>
 
@@ -194,17 +195,23 @@ const SwissArmyRanksApp = () => {
               onClick={allGradesOverview}
               className='w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
             >
-              <BookOpenCheck size={24} />
+              <Files size={24} />
               <span>Alle Grade</span>
             </button>
           </div>
 
           <div className='mt-8 text-center text-md text-gray-500'>
             <p>Lerne alle {ranks.length} Armeegrade</p>
-            <span className='text-xs text-gray-400 mt-4'>Entwickelt von A. Marro - v1.1</span>
-            <a href='https://github.com/AndrasMarro/ArmeeGradeTrainer'>
-              <GithubIcon className='mx-auto my-2 text-gray-500' size={24} />
-            </a>
+            <span className='text-xs text-gray-400 mt-4'>
+              Entwickelt von A. Marro - v1.1{' '}
+              <button
+                onClick={() =>
+                  window.open('https://github.com/AndrasMarro/ArmeeGradeTrainer', '_blank')
+                }
+              >
+                <GithubIcon className='mx-auto text-gray-500' size={18} />
+              </button>
+            </span>
           </div>
         </div>
       </div>
