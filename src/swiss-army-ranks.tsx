@@ -9,9 +9,6 @@ import {
   RotateCcw,
   ArrowRight,
   Github,
-  GitBranch,
-  GitBranchIcon,
-  GitCommit,
   GithubIcon,
   Files,
 } from 'lucide-react';
@@ -44,8 +41,8 @@ const SwissArmyRanksApp = () => {
     return rank[field][language] || rank[field].de;
   };
 
-  const startLearningMode = () => {
-    setGameMode('learning');
+  const startLearningMode = (curMode) => {
+    curMode === 'test' ? setGameMode('test') : setGameMode('learning');
     setMode('game');
     setScore(0);
     setQuestionsAnswered(0);
@@ -175,8 +172,8 @@ const SwissArmyRanksApp = () => {
             </button>
 
             <button
-              onClick={allGradesOverview}
-              disabled={true}
+              onClick={startLearningMode.bind(null, 'test')}
+              disabled={false}
               className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
             >
               <Award size={24} />
@@ -358,8 +355,14 @@ const SwissArmyRanksApp = () => {
 
               {gameMode === 'learning' ? (
                 <div className='text-center mr-4'>
-                  <p className='text-2xl font-bold text-red-600'>{score}</p>
+                  <p className='text-2xl font-bold text-green-600'>
+                    {score} <span className='text-xs text-green-600'>richtig</span>
+                  </p>
                   <p className='text-xs text-gray-500'>von {questionsAnswered}</p>
+                </div>
+              ) : gameMode === 'test' ? (
+                <div className='text-center mr-4'>
+                  <p className='text-2xl font-bold text-red-600'>{questionsAnswered}</p>
                 </div>
               ) : (
                 <div className='text-center'>
@@ -399,27 +402,44 @@ const SwissArmyRanksApp = () => {
 
             {/* Options */}
             <div className='grid grid-cols-1 gap-3 mb-4'>
-              {options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => !showResult && handleAnswer(option)}
-                  disabled={showResult}
-                  className={`p-3 rounded-xl font-semibold text-md transition-all ${
-                    showResult
-                      ? option.name.de === currentQuestion.name.de
-                        ? 'bg-green-500 text-white'
-                        : selectedAnswer?.name.de === option.name.de
-                        ? 'bg-red-500 text-white'
-                        : 'bg-gray-300 text-gray-400'
-                      : 'bg-gray-300 hover:bg-blue-100 text-gray-800 hover:shadow-md transform hover:scale-102'
-                  }`}
-                >
-                  {language === 'de' ? option.name.de : option.name.fr}
-                </button>
-              ))}
+              {options.map((option, index) => {
+                const isSelected = selectedAnswer?.name.de === option.name.de;
+                const isCorrectAnswer = option.name.de === currentQuestion.name.de;
+
+                let buttonClass =
+                  'bg-gray-300 hover:bg-blue-100 text-gray-800 hover:shadow-md transform hover:scale-102';
+
+                if (showResult) {
+                  if (gameMode === 'test') {
+                    // In test mode: neutral style, no green/red feedback
+                    buttonClass = isSelected
+                      ? 'bg-blue-200 text-gray-800'
+                      : 'bg-gray-300 text-gray-400';
+                  } else {
+                    // Normal feedback (learning/game mode)
+                    buttonClass = isCorrectAnswer
+                      ? 'bg-green-500 text-white'
+                      : isSelected
+                      ? 'bg-red-500 text-white'
+                      : 'bg-gray-300 text-gray-400';
+                  }
+                }
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => !showResult && handleAnswer(option)}
+                    disabled={showResult}
+                    className={`p-3 rounded-xl font-semibold text-md transition-all ${buttonClass}`}
+                  >
+                    {language === 'de' ? option.name.de : option.name.fr}
+                  </button>
+                );
+              })}
             </div>
-            {/* Result Feedback */}
-            {showResult && (
+
+            {/* Result Feedback — hidden in test mode */}
+            {showResult && gameMode !== 'test' && (
               <div
                 className={`p-3 rounded-xl mb-4 w-48 mx-auto ${
                   isCorrect ? 'bg-green-300' : 'bg-red-100'
@@ -439,6 +459,7 @@ const SwissArmyRanksApp = () => {
                 )}
               </div>
             )}
+
             {/* Next Button */}
             {showResult && (
               <button
