@@ -5,10 +5,8 @@ import {
   Users,
   BookOpenCheck,
   Trophy,
-  GitHub,
   RotateCcw,
   ArrowRight,
-  Github,
   GithubIcon,
   Files,
 } from 'lucide-react';
@@ -35,13 +33,16 @@ const SwissArmyRanksApp = () => {
   // Filter
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Testmode
+  const [usedRanks, setUsedRanks] = useState<Rank[]>([]);
+
   // Translation
   const [language, setLanguage] = useState('de'); // 'de' oder 'fr'
   const getRankText = (rank, field) => {
     return rank[field][language] || rank[field].de;
   };
 
-  const startLearningMode = (curMode) => {
+  const startGame = (curMode) => {
     curMode === 'test' ? setGameMode('test') : setGameMode('learning');
     setMode('game');
     setScore(0);
@@ -49,9 +50,7 @@ const SwissArmyRanksApp = () => {
     generateQuestion();
   };
 
-  const startPassAndPlay = () => {
-    setMode('passplay-setup');
-  };
+  const startPassAndPlay = () => setMode('passplay-setup');
 
   const allGradesOverview = () => {
     setMode('all-grades-overview');
@@ -80,7 +79,21 @@ const SwissArmyRanksApp = () => {
   };
 
   const generateQuestion = () => {
-    const correctRank = ranks[Math.floor(Math.random() * ranks.length)];
+    let availableRanks = ranks;
+
+    if (gameMode === 'test') {
+      // Filter nur noch ungenutzte Ranks
+      availableRanks = ranks.filter((r) => !usedRanks.includes(r));
+
+      if (availableRanks.length === 0) {
+        // Alle Ranks beantwortet -> Ergebnisse anzeigen
+        setMode('results');
+        return;
+      }
+    }
+
+    const correctRank = availableRanks[Math.floor(Math.random() * availableRanks.length)];
+
     const wrongRanks = ranks
       .filter((r) => r.name !== correctRank.name)
       .sort(() => Math.random() - 0.5)
@@ -92,9 +105,13 @@ const SwissArmyRanksApp = () => {
     setOptions(allOptions);
     setShowResult(false);
     setSelectedAnswer(null);
+
+    if (gameMode === 'test') {
+      setUsedRanks([...usedRanks, correctRank]);
+    }
   };
 
-  const handleAnswer = (selected) => {
+  const handleAnswer = (selected: Rank) => {
     setSelectedAnswer(selected);
     const correct = selected.name === currentQuestion.name;
     setIsCorrect(correct);
@@ -103,6 +120,13 @@ const SwissArmyRanksApp = () => {
     if (gameMode === 'learning') {
       if (correct) setScore(score + 1);
       setQuestionsAnswered(questionsAnswered + 1);
+    } else if (gameMode === 'test') {
+      setQuestionsAnswered(questionsAnswered + 1);
+
+      // Direkt zur nächsten Frage springen
+      setTimeout(() => {
+        nextQuestion();
+      }, 500); // optional: 500ms Delay, damit man kurz die richtige Antwort sehen kann
     } else if (gameMode === 'passplay') {
       const newScores = [...playerScores];
       if (correct) newScores[currentPlayerIndex].score += 1;
@@ -164,7 +188,7 @@ const SwissArmyRanksApp = () => {
 
           <div className='space-y-4'>
             <button
-              onClick={startLearningMode}
+              onClick={startGame}
               className='w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
             >
               <BookOpenCheck size={24} />
@@ -172,7 +196,7 @@ const SwissArmyRanksApp = () => {
             </button>
 
             <button
-              onClick={startLearningMode.bind(null, 'test')}
+              onClick={startGame.bind(null, 'test')}
               disabled={false}
               className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3'
             >
@@ -200,7 +224,7 @@ const SwissArmyRanksApp = () => {
           <div className='mt-8 text-center text-md text-gray-500'>
             <p>Lerne alle {ranks.length} Armeegrade</p>
             <span className='text-xs text-gray-400 mt-4'>
-              Entwickelt von A. Marro - v1.1{' '}
+              Entwickelt von A. Marro - v2.0{' '}
               <button
                 onClick={() =>
                   window.open('https://github.com/AndrasMarro/ArmeeGradeTrainer', '_blank')
@@ -295,48 +319,6 @@ const SwissArmyRanksApp = () => {
     );
   }
 
-  if (mode === 'results') {
-    const sortedScores = [...playerScores].sort((a, b) => b.score - a.score);
-    const winner = sortedScores[0];
-
-    return (
-      <div className='min-h-screen bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 p-4 flex items-center justify-center'>
-        <div className='max-w-md w-full bg-white rounded-2xl shadow-2xl p-8'>
-          <div className='text-center mb-6'>
-            <Trophy className='mx-auto text-yellow-500 mb-4' size={64} />
-            <h2 className='text-3xl font-bold text-gray-800 mb-2'>Spielende!</h2>
-            <p className='text-xl text-gray-600'>Gewinner: {winner.name}</p>
-          </div>
-
-          <div className='space-y-3 mb-6'>
-            {sortedScores.map((player, index) => (
-              <div
-                key={index}
-                className='bg-gray-200 rounded-lg p-4 flex justify-between items-center'
-              >
-                <div className='flex items-center gap-3'>
-                  <span className='text-2xl font-bold text-gray-400'>#{index + 1}</span>
-                  <span className='font-semibold text-gray-800'>{player.name}</span>
-                </div>
-                <div className='text-right'>
-                  <p className='text-2xl font-bold text-blue-600'>{player.score}</p>
-                  <p className='text-xs text-gray-500'>von {player.answered}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={resetGame}
-            className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105'
-          >
-            Zurück zum Menü
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   if (mode === 'game') {
     const currentPlayer = gameMode === 'passplay' ? playerScores[currentPlayerIndex] : null;
 
@@ -346,12 +328,23 @@ const SwissArmyRanksApp = () => {
           {/* Header */}
           <div className='bg-red-100 rounded-t-2xl p-4 shadow-lg'>
             <div className='flex justify-between items-center'>
-              <button
-                onClick={resetGame}
-                className='bg-gray-500  text-white font-semibold py-3 px-6 rounded-xl shadow-lg'
-              >
-                Zurück
-              </button>
+              <div>
+                <button
+                  onClick={resetGame}
+                  className='bg-gray-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg'
+                >
+                  Zurück
+                </button>
+
+                {(gameMode === 'test' || gameMode === 'passplay') && (
+                  <button
+                    onClick={() => setMode('results')}
+                    className='bg-red-500 text-white font-semibold py-2 px-3 ml-2 rounded-xl shadow-lg'
+                  >
+                    surrender
+                  </button>
+                )}
+              </div>
 
               {gameMode === 'learning' ? (
                 <div className='text-center mr-4'>
@@ -461,7 +454,7 @@ const SwissArmyRanksApp = () => {
             )}
 
             {/* Next Button */}
-            {showResult && (
+            {showResult && gameMode !== 'test' && (
               <button
                 onClick={nextQuestion}
                 className='w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2'
@@ -495,6 +488,73 @@ const SwissArmyRanksApp = () => {
         </div>
       </div>
     );
+  }
+
+  if (mode === 'results') {
+    if (gameMode === 'passplay') {
+      const sortedScores = [...playerScores].sort((a, b) => b.score - a.score);
+      const winner = sortedScores[0];
+
+      return (
+        <div className='min-h-screen bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 p-4 flex items-center justify-center'>
+          <div className='max-w-md w-full bg-white rounded-2xl shadow-2xl p-8'>
+            <div className='text-center mb-6'>
+              <Trophy className='mx-auto text-yellow-500 mb-4' size={64} />
+              <h2 className='text-3xl font-bold text-gray-800 mb-2'>Spielende!</h2>
+              <p className='text-xl text-gray-600'>Gewinner: {winner.name}</p>
+            </div>
+
+            <div className='space-y-3 mb-6'>
+              {sortedScores.map((player, index) => (
+                <div
+                  key={index}
+                  className='bg-gray-200 rounded-lg p-4 flex justify-between items-center'
+                >
+                  <div className='flex items-center gap-3'>
+                    <span className='text-2xl font-bold text-gray-400'>#{index + 1}</span>
+                    <span className='font-semibold text-gray-800'>{player.name}</span>
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-2xl font-bold text-blue-600'>{player.score}</p>
+                    <p className='text-xs text-gray-500'>von {player.answered}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={resetGame}
+              className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105'
+            >
+              Zurück zum Menü
+            </button>
+          </div>
+        </div>
+      );
+    } else if (gameMode === 'test') {
+      return (
+        <div className='min-h-screen bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 p-4 flex items-center justify-center'>
+          <div className='max-w-md w-full bg-white rounded-2xl shadow-2xl p-8'>
+            <div className='text-center mb-6'>
+              <Trophy className='mx-auto text-yellow-500 mb-4' size={64} />
+              <h2 className='text-3xl font-bold text-gray-800 mb-2'>Test beendet!</h2>
+              <p className='text-xl text-gray-600'>
+                Du hast <span className='font-bold text-red-800'>{score}</span> von{' '}
+                <span className='font-bold text-green-600'>{questionsAnswered}</span> Fragen richtig
+                beantwortet.
+              </p>
+            </div>
+
+            <button
+              onClick={resetGame}
+              className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105'
+            >
+              Zurück zum Menü
+            </button>
+          </div>
+        </div>
+      );
+    }
   }
 
   if (mode === 'all-grades-overview') {
